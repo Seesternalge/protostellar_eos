@@ -1,13 +1,4 @@
-#include <cmath>
-
-double K_dis(double T);
-double K_ion(double T);
-double K_He1(double T);
-double K_He2(double T);
-
-void calculate_abundances(double X, double Y, double rho, double T, double abundances[7]);
-double solve_for_electron_abundance(double nH_tot, double nHe_tot, double K_dis, double K_ion, double K_He1, double K_He2);
-double f_ne(double ne, double nH_tot, double nHe_tot, double K_dis, double K_ion, double K_He1, double K_He2);
+#include "proto.h"
 
 double K_dis(double T)
 {
@@ -29,13 +20,14 @@ double K_He2(double T)
   return z_Hep2(T) * z_e(T) / z_Hep(T);
 }
 
-void calculate_abundances(double X, double Y, double rho, double T, double abundances[7])
+void calculate_abundances(double rho, double T, double abundances[7])
 {
+  double X = All.X, Y = All.Y, mP = All.mP, me = All.me, mu_H = All.mu_H, mu_He = All.mu_He;
   double ne, nH, nHe, nH2, nHp, nHep, nHep2;
   
   double Kdis = fmax(1e-200 , K_dis(T)), Kion = fmax(1e-200 , K_ion(T)), KHe1 = fmax(1e-200 , K_He1(T)), KHe2 = fmax(1e-200 , K_He2(T)); 
   
-  double nH_tot = rho * X / (1.67262178e-24 + 9.1093829e-28), nHe_tot = rho * Y / (4.002602 / 1.007276466621 * 1.67262178e-24);
+  double nH_tot = rho * X / (mP + me), nHe_tot = rho * Y / (mu_He / mu_H * mP);
   
   ne = solve_for_electron_abundance(nH_tot, nHe_tot, Kdis, Kion, KHe1, KHe2);
   
@@ -74,17 +66,10 @@ double solve_for_electron_abundance(double nH_tot, double nHe_tot, double Kdis, 
   do
     {
       ne = 0.5 * (ne_lower + ne_upper);
-
       err = f_ne(ne, nH_tot, nHe_tot, Kdis, Kion, KHe1, KHe2);
-
-      if(err * f_ne(ne_lower, nH_tot, nHe_tot, Kdis, Kion, KHe1, KHe2) > 0.0)
-        {
-          ne_lower = ne;
-        }
-      else
-        {
-          ne_upper = ne;
-        }
+      
+      if(err * f_ne(ne_lower, nH_tot, nHe_tot, Kdis, Kion, KHe1, KHe2) > 0.0) ne_lower = ne;
+      else ne_upper = ne;
 
       dne = ne_upper - ne_lower;
       iter++;
