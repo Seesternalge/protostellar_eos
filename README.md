@@ -1,2 +1,2 @@
 # protostellar_chemistry
-Custom implementation of the chemistry used for protostar calculations by Tomida et al. 2013 and described therein. 
+Custom implementation of the chemistry used and described for protostar formation by Tomida et al. 2013. 
