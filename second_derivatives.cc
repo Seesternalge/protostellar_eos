@@ -69,7 +69,6 @@ double d2ln_z_H2_vib(double T)
 {
   double theta_vib = All.theta_vib;
   if(T < theta_vib / 10.0) T = theta_vib / 10.0; // To prevent overflow
-  //return theta_vib * (theta_vib * exp(theta_vib / T) - 2.0 * T * (exp(theta_vib / T) - 1.0)) / (pow(T,4.0) * pow(exp(theta_vib / T) - 1.0 , 2.0));
   return pow(theta_vib , 2.0) / (pow(T , 4.0) * pow(exp(theta_vib / T) - 1.0 , 2.0)) + (pow(theta_vib , 2.0) - 2.0 * theta_vib * T)/ (pow(T , 4.0) * (exp(theta_vib / T) - 1.0));
 }
 
